@@ -18,7 +18,7 @@ router.get('/upload-signature', protect, (req, res) => {
         res.json({
             signature,
             timestamp,
-            cloudName: process.env.clound_name,
+            cloudName: process.env.cloud_name,
             apiKey: process.env.api_key
         });
     } catch (error) {
