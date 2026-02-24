@@ -156,14 +156,27 @@ router.get('/:id', protect, async (req, res) => {
             .stroke();
 
         // --- TOTALS SECTION ---
+        // Calculate original subtotal from items
+        const actualSubtotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const shippingCharge = order.totalAmount - actualSubtotal;
+
         currentY += 15;
 
-        // Subtotal
+        // Subtotal (Sum of items)
         doc.fontSize(10)
             .fillColor(darkGray)
             .font('Helvetica')
             .text('Subtotal:', 390, currentY, { width: 70, align: 'right' })
-            .text(`Rs ${order.totalAmount.toFixed(2)}`, 475, currentY, { width: 60, align: 'right' });
+            .text(`Rs ${actualSubtotal.toFixed(2)}`, 475, currentY, { width: 60, align: 'right' });
+
+        currentY += 15;
+
+        // Shipping
+        doc.fontSize(10)
+            .fillColor(darkGray)
+            .font('Helvetica')
+            .text('Shipping:', 390, currentY, { width: 70, align: 'right' })
+            .text(`Rs ${shippingCharge.toFixed(2)}`, 475, currentY, { width: 60, align: 'right' });
 
         currentY += 20;
 

@@ -5,6 +5,11 @@ const Customer = require('../models/Customer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { protectCustomer } = require('../middleware/authMiddleware');
+const { OAuth2Client } = require('google-auth-library');
+
+// Important: You should replace 'YOUR_GOOGLE_CLIENT_ID' with your actual client ID in .env
+// For example: GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Generate JWT
 const generateToken = (id, type = 'admin') => {
@@ -94,6 +99,63 @@ router.post('/customer/login', async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+// @route   POST api/auth/customer/google
+// @desc    Auth customer with Google SSO (Login / Register)
+// @access  Public
+router.post('/customer/google', async (req, res) => {
+    const { token } = req.body;
+
+    try {
+        // Verify the Google token
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        const { name, email } = payload;
+
+        // Check if customer exists
+        let customer = await Customer.findOne({ email });
+
+        if (customer) {
+            // Already a customer - just login
+            return res.json({
+                _id: customer._id,
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone || 'Not Provided',
+                token: generateToken(customer._id, 'customer')
+            });
+        } else {
+            // New user via Google - register them
+            // We generate a random password to fulfill the schema requirement
+            const randomPassword = require('crypto').randomBytes(16).toString('hex');
+
+            customer = await Customer.create({
+                name: name,
+                email: email,
+                phone: 'Not Provided', // Placeholder since Google doesn't provide phone
+                password: randomPassword
+            });
+
+            if (customer) {
+                return res.status(201).json({
+                    _id: customer._id,
+                    name: customer.name,
+                    email: customer.email,
+                    phone: customer.phone,
+                    token: generateToken(customer._id, 'customer')
+                });
+            } else {
+                return res.status(400).json({ message: 'Invalid customer data from Google' });
+            }
+        }
+    } catch (error) {
+        console.error('Google Auth Error:', error.message);
+        res.status(401).json({ message: 'Invalid Google Identity Token' });
     }
 });
 
