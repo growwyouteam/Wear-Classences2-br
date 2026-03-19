@@ -1,31 +1,13 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const sendOrderConfirmationEmail = async (order) => {
   try {
-    // SMTP configuration logic
-    let transporterConfig;
-    if (process.env.EMAIL_SERVICE === 'godaddy') {
-      transporterConfig = {
-        host: process.env.EMAIL_HOST || 'smtpout.secureserver.net',
-        port: process.env.EMAIL_PORT || 465,
-        secure: true, // SSL
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-        }
-      };
-    } else {
-      // Default to Gmail or other predefined Nodemailer services
-      transporterConfig = {
-        service: process.env.EMAIL_SERVICE || 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-        }
-      };
+    if (!process.env.RESEND_API_KEY) {
+      console.error('❌ RESEND_API_KEY is missing in environment variables.');
+      return null;
     }
 
-    const transporter = nodemailer.createTransport(transporterConfig);
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     // Build items HTML list
     const itemsHtml = (order.items || []).map(item => `
@@ -38,7 +20,7 @@ const sendOrderConfirmationEmail = async (order) => {
         `).join('');
 
     const mailOptions = {
-      from: `"Wear Classences" <${process.env.EMAIL_USER}>`,
+      from: `Wear Classences <${process.env.EMAIL_USER || 'onboarding@resend.dev'}>`,
       to: order.email,
       subject: `✅ Order Confirmed! Order #${order._id}`,
       html: `
@@ -145,8 +127,8 @@ const sendOrderConfirmationEmail = async (order) => {
           <tr>
             <td style="background:#333; padding: 20px 30px; text-align:center;">
               <p style="color:#ccc; font-size:13px; margin:0 0 5px 0;">किसी भी सहायता के लिए हमसे संपर्क करें</p>
-              <p style="color:#B8860B; font-size:13px; margin:0;">${process.env.EMAIL_USER}</p>
-              <p style="color:#777; font-size:12px; margin:12px 0 0 0;">© 2025 Wear Classences. All rights reserved.</p>
+              <p style="color:#B8860B; font-size:13px; margin:0;">${process.env.EMAIL_USER || 'support@wearclassenses.com'}</p>
+              <p style="color:#777; font-size:12px; margin:12px 0 0 0;">© 2026 Wear Classences. All rights reserved.</p>
             </td>
           </tr>
 
@@ -156,12 +138,18 @@ const sendOrderConfirmationEmail = async (order) => {
   </table>
 </body>
 </html>
-            `
+      `
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Order confirmation email sent to:', order.email, '| MessageID:', info.messageId);
-    return info;
+    const data = await resend.emails.send(mailOptions);
+
+    if (data.error) {
+      console.error('❌ Resend API Error:', data.error);
+      return null;
+    }
+
+    console.log('✅ Order confirmation email sent to:', order.email, '| Resend ID:', data.data.id);
+    return data;
   } catch (error) {
     console.error('❌ Error sending order confirmation email:', error.message);
     // Email fail होने पर order fail नहीं होगा

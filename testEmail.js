@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const dotenv = require('dotenv');
 const path = require('path');
 
@@ -6,59 +6,38 @@ const path = require('path');
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const testEmail = async () => {
-    console.log('Testing Email Configuration...');
-    console.log('EMAIL_SERVICE:', process.env.EMAIL_SERVICE);
+    console.log('Testing Resend Email Configuration...');
+    console.log('RESEND_API_KEY:', process.env.RESEND_API_KEY ? 'Loaded' : 'Missing');
     console.log('EMAIL_USER:', process.env.EMAIL_USER);
-    // console.log('EMAIL_PASS:', process.env.EMAIL_PASS); // Hidden for security
 
-    let transporterConfig;
-    if (process.env.EMAIL_SERVICE === 'godaddy') {
-        transporterConfig = {
-            host: process.env.EMAIL_HOST || 'smtpout.secureserver.net',
-            port: process.env.EMAIL_PORT || 587,
-            secure: false, // TLS
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            },
-            tls: {
-                ciphers: 'SSLv3', // Required for some GoDaddy configurations
-                rejectUnauthorized: false
-            },
-            logger: true,
-            debug: true,
-            connectionTimeout: 10000,
-            greetingTimeout: 10000
-        };
-    } else {
-        transporterConfig = {
-            service: process.env.EMAIL_SERVICE || 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        };
+    if (!process.env.RESEND_API_KEY) {
+        console.error('❌ Please add your RESEND_API_KEY to the .env file in the backend directory.');
+        return;
     }
 
-    const transporter = nodemailer.createTransport(transporterConfig);
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     try {
-        console.log('Verifying connection...');
-        await transporter.verify();
-        console.log('✅ Connection verified successfully!');
+        console.log('Sending test email via Resend...');
 
         const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: process.env.EMAIL_USER, // Send to self
-            subject: 'Test Email - Wear Classences',
-            text: 'This is a test email to verify SMTP configuration.'
+            from: `Wear Classences <${process.env.EMAIL_USER || 'onboarding@resend.dev'}>`,
+            to: process.env.EMAIL_USER || 'your_email@gmail.com', // Replace with your receiving email if needed
+            subject: 'Test Email from Resend - Wear Classences',
+            html: '<p>This is a test email to verify <strong>Resend</strong> configuration.</p>'
         };
 
-        console.log('Sending test email...');
-        const info = await transporter.sendMail(mailOptions);
-        console.log('✅ Test email sent:', info.messageId);
+        const data = await resend.emails.send(mailOptions);
+
+        if (data.error) {
+            console.error('❌ Failed to send test email with Resend API Error:');
+            console.error(data.error);
+            return;
+        }
+
+        console.log('✅ Test email sent successfully! Resend Delivery ID:', data.data.id);
     } catch (error) {
-        console.error('❌ Failed to send test email:');
+        console.error('❌ Exception occurred while sending test email:');
         console.error(error);
     }
 };
