@@ -80,7 +80,7 @@ const sendOrderConfirmationEmail = async (order) => {
     const formattedAddress = formatAddress(order.address);
 
     const mailOptions = {
-      from: `Wear Classences <onboarding@resend.dev>`,
+      from: `Wear Classences <support@wearclassense.com>`,
       to: order.email,
       subject: `✅ Order Confirmed — #${String(order._id).slice(-8).toUpperCase()} | Wear Classences`,
       html: `<!DOCTYPE html>
