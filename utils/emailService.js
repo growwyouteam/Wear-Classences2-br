@@ -80,15 +80,15 @@ const sendOrderConfirmationEmail = async (order) => {
     const formattedAddress = formatAddress(order.address);
 
     const mailOptions = {
-      from: `Wear Classences <support@wearclassense.com>`,
+      from: `Wear Classense <support@wearclassense.com>`,
       to: order.email,
-      subject: `✅ Order Confirmed — #${String(order._id).slice(-8).toUpperCase()} | Wear Classences`,
+      subject: `✅ Order Confirmed — #${String(order._id).slice(-8).toUpperCase()} | Wear Classense`,
       html: `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order Confirmed – Wear Classences</title>
+  <title>Order Confirmed – Wear Classense</title>
 </head>
 <body style="margin:0; padding:0; background-color:#f5f0e8; font-family: 'Helvetica Neue', Arial, sans-serif;">
 
@@ -100,7 +100,7 @@ const sendOrderConfirmationEmail = async (order) => {
           <!-- ===== TOP GOLD HEADER ===== -->
           <tr>
             <td style="background: linear-gradient(135deg, #B8860B 0%, #DAA520 50%, #B8860B 100%); padding: 36px 30px; text-align: center;">
-              <h1 style="color:#ffffff; margin:0; font-size:28px; font-weight:800; letter-spacing:3px; text-transform:uppercase;">WEAR CLASSENCES</h1>
+              <h1 style="color:#ffffff; margin:0; font-size:28px; font-weight:800; letter-spacing:3px; text-transform:uppercase;">WEAR CLASSENSE</h1>
               <p style="color:#fff8dc; margin:6px 0 0 0; font-size:13px; letter-spacing:1px;">Premium Fashion — Est. 2024</p>
             </td>
           </tr>
@@ -222,9 +222,9 @@ const sendOrderConfirmationEmail = async (order) => {
           <!-- ===== FOOTER ===== -->
           <tr>
             <td style="background:#1a1a1a; padding: 22px 30px; text-align:center;">
-              <p style="color:#B8860B; font-size:16px; font-weight:700; margin:0 0 4px 0; letter-spacing:2px;">WEAR CLASSENCES</p>
+              <p style="color:#B8860B; font-size:16px; font-weight:700; margin:0 0 4px 0; letter-spacing:2px;">WEAR CLASSENSE</p>
               <p style="color:#888; font-size:12px; margin:0 0 10px 0;">Premium Fashion — Style Redefined</p>
-              <p style="color:#555; font-size:11px; margin:0;">© ${new Date().getFullYear()} Wear Classences. All rights reserved.</p>
+              <p style="color:#555; font-size:11px; margin:0;">© ${new Date().getFullYear()} Wear Classense. All rights reserved.</p>
               <p style="color:#444; font-size:11px; margin:6px 0 0 0;">This is an automated email. Please do not reply to this email.</p>
             </td>
           </tr>
