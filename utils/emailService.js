@@ -54,6 +54,32 @@ const sendOrderConfirmationEmail = async (order) => {
             </td>
           </tr>`
         : '';
+        
+    // Calculate Subtotal (sum of items)
+    const subtotal = (order.items || []).reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
+    
+    // Delivery Charges calculation
+    // Final Grand Total = Subtotal - Discount + Delivery
+    // So: Delivery = Grand Total - Subtotal + Discount
+    const grandTotal = Number(order.totalAmount);
+    const discount = Number(order.discountAmount || 0);
+    
+    // Using Math.round to avoid Javascript floating point issues (e.g. 98.999999999)
+    let deliveryCharges = Math.round(grandTotal - subtotal + discount);
+    
+    // Ensure it doesn't show negative by accident due to data issues
+    deliveryCharges = Math.max(0, deliveryCharges);
+
+    const deliveryHtml = `
+      <tr>
+        <td colspan="3" style="padding: 10px 10px; text-align: right; font-size: 14px; color: #555; font-weight: 600;">
+          🚚 Delivery Charges:
+        </td>
+        <td style="padding: 10px 10px; text-align: right; font-size: 14px; color: #333; font-weight: 600;">
+          ${deliveryCharges > 0 ? formatCurrency(deliveryCharges) : '<span style="color:#228B22;">Free</span>'}
+        </td>
+      </tr>
+    `;
 
     // Order date
     const orderDate = order.createdAt
@@ -173,12 +199,21 @@ const sendOrderConfirmationEmail = async (order) => {
                   ${itemsHtml}
                 </tbody>
                 <tfoot>
+                  <tr>
+                    <td colspan="3" style="padding:14px 10px 5px 10px; text-align:right; font-size:14px; color:#555; font-weight:600; border-top: 2px solid #B8860B;">
+                      Subtotal:
+                    </td>
+                    <td style="padding:14px 10px 5px 10px; text-align:right; font-size:14px; color:#333; font-weight:600; border-top: 2px solid #B8860B;">
+                      ${formatCurrency(subtotal)}
+                    </td>
+                  </tr>
+                  ${deliveryHtml}
                   ${couponHtml}
                   <tr>
-                    <td colspan="3" style="padding:14px 10px; text-align:right; font-size:15px; color:#1a1a1a; font-weight:700; border-top: 2px solid #B8860B;">
+                    <td colspan="3" style="padding:10px 10px 14px 10px; text-align:right; font-size:15px; color:#1a1a1a; font-weight:700; border-top: 1px solid #f0e8d0;">
                       Grand Total:
                     </td>
-                    <td style="padding:14px 10px; text-align:right; font-size:18px; color:#B8860B; font-weight:800; border-top: 2px solid #B8860B;">
+                    <td style="padding:10px 10px 14px 10px; text-align:right; font-size:18px; color:#B8860B; font-weight:800; border-top: 1px solid #f0e8d0;">
                       ${formatCurrency(order.totalAmount)}
                     </td>
                   </tr>
