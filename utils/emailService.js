@@ -127,7 +127,6 @@ const sendOrderConfirmationEmail = async (order) => {
           <tr>
             <td style="background: linear-gradient(135deg, #B8860B 0%, #DAA520 50%, #B8860B 100%); padding: 36px 30px; text-align: center;">
               <h1 style="color:#ffffff; margin:0; font-size:28px; font-weight:800; letter-spacing:3px; text-transform:uppercase;">WEAR CLASSENSE</h1>
-              <p style="color:#fff8dc; margin:6px 0 0 0; font-size:13px; letter-spacing:1px;">Premium Fashion — Est. 2024</p>
             </td>
           </tr>
 
@@ -258,7 +257,6 @@ const sendOrderConfirmationEmail = async (order) => {
           <tr>
             <td style="background:#1a1a1a; padding: 22px 30px; text-align:center;">
               <p style="color:#B8860B; font-size:16px; font-weight:700; margin:0 0 4px 0; letter-spacing:2px;">WEAR CLASSENSE</p>
-              <p style="color:#888; font-size:12px; margin:0 0 10px 0;">Premium Fashion — Style Redefined</p>
               <p style="color:#555; font-size:11px; margin:0;">© ${new Date().getFullYear()} Wear Classense. All rights reserved.</p>
               <p style="color:#444; font-size:11px; margin:6px 0 0 0;">This is an automated email. Please do not reply to this email.</p>
             </td>
