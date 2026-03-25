@@ -246,8 +246,8 @@ const sendOrderConfirmationEmail = async (order) => {
                 Have questions about your order? We're here to help!
               </p>
               <p style="margin:6px 0 0 0; font-size:14px;">
-                <a href="mailto:${process.env.EMAIL_USER || 'support@wearclassense.com'}" style="color:#B8860B; text-decoration:none; font-weight:600;">
-                  ${process.env.EMAIL_USER || 'support@wearclassense.com'}
+                <a href="mailto:support@wearclassense.com" style="color:#B8860B; text-decoration:none; font-weight:600;">
+                  support@wearclassense.com
                 </a>
               </p>
             </td>
