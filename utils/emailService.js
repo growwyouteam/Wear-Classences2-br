@@ -46,7 +46,7 @@ const sendOrderConfirmationEmail = async (order) => {
     const couponHtml =
       order.discountAmount > 0
         ? `<tr>
-            <td colspan="3" style="padding: 10px 10px; text-align: right; font-size: 14px; color: #228B22; font-weight: 600;">
+            <td colspan="3" style="padding: 1 0px 10px; text-align: right; font-size: 14px; color: #228B22; font-weight: 600;">
               🎟 Coupon Discount${order.couponCode ? ` (${order.couponCode})` : ''}:
             </td>
             <td style="padding: 10px 10px; text-align: right; font-size: 14px; color: #228B22; font-weight: 700;">
@@ -54,23 +54,23 @@ const sendOrderConfirmationEmail = async (order) => {
             </td>
           </tr>`
         : '';
-        
+
     // Calculate Subtotal (sum of items)
     const subtotal = (order.items || []).reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
-    
+
     // Delivery Charges calculation
     // Final Grand Total = Subtotal - Discount + Delivery
     // So: Delivery = Grand Total - Subtotal + Discount
     const grandTotal = Number(order.totalAmount);
     const discount = Number(order.discountAmount || 0);
-    
+
     // Using Math.round to avoid Javascript floating point issues (e.g. 98.999999999)
     let deliveryCharges = Math.round(grandTotal - subtotal + discount);
-    
+
     // Ensure it doesn't show negative by accident due to data issues
     deliveryCharges = Math.max(0, deliveryCharges);
 
-    const deliveryHtml = `
+    const deliveryHtml =`
       <tr>
         <td colspan="3" style="padding: 10px 10px; text-align: right; font-size: 14px; color: #555; font-weight: 600;">
           🚚 Delivery Charges:
@@ -84,15 +84,15 @@ const sendOrderConfirmationEmail = async (order) => {
     // Order date
     const orderDate = order.createdAt
       ? new Date(order.createdAt).toLocaleDateString('en-IN', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        })
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
       : new Date().toLocaleDateString('en-IN', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        });
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
 
     // Estimated delivery (5-7 business days from now)
     const deliveryDate = new Date();

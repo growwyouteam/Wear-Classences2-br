@@ -46,6 +46,7 @@ app.use('/api/home', require('./routes/home'));
 app.use('/api/invoices', require('./routes/invoices'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/payment', require('./routes/payment'));
+app.use('/api/reels', require('./routes/reels'));
 
 // Root Endpoint
 app.get('/', (req, res) => {
