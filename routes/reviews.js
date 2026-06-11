@@ -1,7 +1,40 @@
 const express = require('express');
 const router = express.Router();
 const Review = require('../models/Review');
-const { protectCustomer } = require('../middleware/authMiddleware');
+const { protectCustomer, protect } = require('../middleware/authMiddleware');
+
+// @route   GET /api/reviews/admin/all
+// @desc    Get ALL reviews across all products (admin only)
+// @access  Private (Admin)
+router.get('/admin/all', protect, async (req, res) => {
+    try {
+        const reviews = await Review.find()
+            .populate('productId', 'name images')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        res.json(reviews);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// @route   DELETE /api/reviews/admin/:reviewId
+// @desc    Admin can delete any review
+// @access  Private (Admin)
+router.delete('/admin/:reviewId', protect, async (req, res) => {
+    try {
+        const review = await Review.findById(req.params.reviewId);
+        if (!review) {
+            return res.status(404).json({ message: 'Review nahi mili.' });
+        }
+        await review.deleteOne();
+        res.json({ message: 'Review delete ho gayi.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 
 // @route   GET /api/reviews/:productId
 // @desc    Get all reviews for a product (public)
